@@ -1,7 +1,5 @@
 import datetime
 import time
-import geopandas
-import shapely
 
 itc = 0
 
