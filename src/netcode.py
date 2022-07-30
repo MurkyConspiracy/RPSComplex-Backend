@@ -31,7 +31,10 @@ class netsock:
                 data = conn.recv(1024)
                 if not data:
                     break
-                lprint(data)
+                lprint(str(data))
+                conn.send(b"Data Rec: " + bytes(str(data),'UTF-8'))
+                lprint("Data sent back!")
+        self._listen()
                 
 
     
