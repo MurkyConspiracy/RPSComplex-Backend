@@ -34,7 +34,7 @@ class netsock:
                 lprint(str(data))
                 conn.send(b"Data Rec: " + bytes(str(data),'UTF-8'))
                 lprint("Data sent back!")
-        lprint('End Listen')
+        lprint('End Listen...')
         self._listen()
                 
 
