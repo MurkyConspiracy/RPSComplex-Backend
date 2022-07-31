@@ -1,19 +1,19 @@
 import socket
-from loclogger import lprint
+from libraries.loghandler import lprint
 import threading
+
+
 
 class netsock:
 
     def __init__(self,port):
-        lprint('Start netsock constructor')
         self._port = port
         self._hostname = socket.gethostname()
         self._socket = self._buildSocket()
         netthread = threading.Thread(target=self._listen)
         netthread.start()
     
-
-    def _buildSocket(self,):
+    def _buildSocket(self):
         lprint('Build socket')
         sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
         lprint('Binding..')
@@ -32,7 +32,7 @@ class netsock:
                 if not data:
                     break
                 lprint(str(data))
-                conn.send(b"Data Rec: " + bytes(str(data),'UTF-8'))
+                conn.send("Data Rec: " + str(data),'UTF-8')
                 lprint("Data sent back!")
         lprint('End Listen...')
         self._listen()
