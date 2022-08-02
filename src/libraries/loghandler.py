@@ -1,5 +1,6 @@
 import datetime
 
+#This is trash I guess, going to work with Caleb to understand how to log like a man
 class LLevel:
         DEBUG = 0
         LOG = 1
