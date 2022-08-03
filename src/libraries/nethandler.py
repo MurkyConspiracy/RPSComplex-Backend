@@ -1,6 +1,8 @@
+from ast import expr_context
 import socket
 from libraries.loghandler import lprint
 import threading
+import datahandler
 
 
 #OOP class for defining a socket object -> netsock
@@ -39,8 +41,14 @@ class netsock:
                 data = conn.recv(1024)
                 if not data:
                     break
-                lprint(str(data))
-                conn.send("Data Rec: " + str(data),'UTF-8')
+                try:
+                    lprint(str(data))
+                except:
+                    lprint("Data print failed, trying parse")
+                requestState = "Routed" if datahandler.handleTCPRequest(data) else 'Rejected' 
+                lprint('TCP Packet State:\t{0}'.format(requestState))
+
+                conn.send("Data Rec: {0}".format(str(data)) + "\nState:\t{0}".format(requestState),'UTF-8')
                 lprint("Data sent back!")
         lprint('End Listen...')
         self._listen()
