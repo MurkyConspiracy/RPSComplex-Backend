@@ -1,4 +1,4 @@
-from loghandler import lprint
+from libraries.loghandler import lprint
 #File Header to know where to start parsing data
 _HEADER = (b'RPS')
 
