@@ -16,6 +16,7 @@ class netsock:
         self._hostname = socket.gethostname()
         self._socket = self._buildSocket()
         netthread = threading.Thread(target=self._listen)
+        lprint('Starting network thread!')
         netthread.start()
     
     #Creates the TCP/IP socket and binds it to the defined port on the address
@@ -23,7 +24,7 @@ class netsock:
     def _buildSocket(self):
         lprint('Build socket')
         sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-        lprint('Binding..')
+        lprint('Binding...')
         sock.bind((self._hostname,self._port))
         lprint('Socket established')
         return sock
@@ -42,12 +43,19 @@ class netsock:
                     break
                 try:
                     lprint(str(data))
+                    requestState = handleTCPRequest(data)
+                    lprint('TCP Packet State Alert:\t{0}'.format(requestState[1]))
+                    if len(requestState = 3):
+                        packetResponse = 'Packet Type:\t{0}\nRouted:\t{1}\nValue:\t{2}'.format(requestState[0],requestState[1],requestState[2]).encode('utf-8')
+                        lprint(packetResponse)
+                        conn.send(packetResponse)
+                    else:
+                        lprint("Malformed Response!")
                 except:
-                    lprint("Data print failed, trying parse")
-                requestState = "Routed" if handleTCPRequest(data) else 'Rejected' 
-                lprint('TCP Packet State:\t{0}'.format(requestState))
+                    lprint("Data parsing failed! Resetting connection.")
+                    break
 
-                conn.send("Data Rec: {0}".format(str(data)) + "\nState:\t{0}".format(requestState),'UTF-8')
+                conn.send("Data Rec:\t{0}\nState:\t{1}".format(str(data),requestState).encode('utf-8'))
                 lprint("Data sent back!")
         lprint('End Listen...')
         self._listen()

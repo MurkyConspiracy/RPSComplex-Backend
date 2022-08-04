@@ -1,7 +1,6 @@
-import sys, os
-sys.path.insert(0,os.getcwd() + '/libraries')
-from libraries.nethandler import *
+from urllib.request import DataHandler
+from libraries import *
+from libraries.nethandler import netsock
 
 netConnection = netsock(6666)
-
-print('done')
+libraries.loghandler.lprint('Start packet test:\t{0}'.format(str(libraries.datahandler.testPackerRouting())))
