@@ -38,25 +38,23 @@ class netsock:
         conn, addr = self._socket.accept()
         with conn:
             while True:
-                data = conn.recv(1024)
+                try:
+                    data = conn.recv(1024)
+                except ConnectionResetError:
+                    self._listen()
+                    lprint('Connection Reset! Exiting current connection')
+                    return
                 if not data:
                     break
-                try:
-                    lprint(str(data))
-                    requestState = handleTCPRequest(data)
-                    lprint('TCP Packet State Alert:\t{0}'.format(requestState[1]))
-                    if len(requestState = 3):
-                        packetResponse = 'Packet Type:\t{0}\nRouted:\t{1}\nValue:\t{2}'.format(requestState[0],requestState[1],requestState[2]).encode('utf-8')
-                        lprint(packetResponse)
-                        conn.send(packetResponse)
-                    else:
-                        lprint("Malformed Response!")
-                except:
-                    lprint("Data parsing failed! Resetting connection.")
-                    break
-
-                conn.send("Data Rec:\t{0}\nState:\t{1}".format(str(data),requestState).encode('utf-8'))
-                lprint("Data sent back!")
+                lprint(str(data))
+                requestState = handleTCPRequest(data)
+                lprint('TCP Packet State Alert:\t{0}'.format(requestState[1]))
+                if len(requestState) == 3:
+                    packetResponse = 'Packet Type:\t{0}\nRouted:\t{1}\nValue:\t{2}'.format(requestState[0],requestState[1],requestState[2]).encode('utf-8')
+                    lprint(packetResponse)
+                    conn.send(packetResponse)
+                else:
+                    lprint("Malformed Response!")
         lprint('End Listen...')
         self._listen()
                 
