@@ -1,3 +1,4 @@
+from ntpath import join
 import socket
 from libraries.loghandler import lprint
 import threading
@@ -6,7 +7,11 @@ from libraries.datahandler import handleTCPRequest
 
 #OOP class for defining a socket object -> netsock
 #This class will handle all inbound requests from the Frontend and send data to the Database
-class netsock:
+
+
+#Change to thread based naming scheme
+#Refactor to use a better structure
+class netthread:
 
     #Object constructor with network port as paramater
     #Grabs bound IP address and assigns it
@@ -44,13 +49,15 @@ class netsock:
                     self._listen()
                     lprint('Connection Reset! Exiting current connection')
                     return
+                except KeyboardInterrupt:
+                    raise
                 if not data:
                     break
                 lprint(str(data))
                 requestState = handleTCPRequest(data)
-                lprint('TCP Packet State Alert:\t{0}'.format(requestState[1]))
+                lprint(f'TCP Packet State Alert:\t{requestState[1]}')
                 if len(requestState) == 3:
-                    packetResponse = 'Packet Type:\t{0}\nRouted:\t{1}\nValue:\t{2}'.format(requestState[0],requestState[1],requestState[2]).encode('utf-8')
+                    packetResponse = f'Packet State:\t{requestState[0]}\nRouted:\t{requestState[1]}\nValue:\t{requestState[2]}'.encode('utf-8')
                     lprint(packetResponse)
                     conn.send(packetResponse)
                 else:

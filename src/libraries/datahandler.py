@@ -1,3 +1,5 @@
+import json
+from tokenize import String
 from libraries.loghandler import lprint
 #File Header to know where to start parsing data
 _HEADER = (b'RPS')
@@ -47,23 +49,36 @@ def handleTCPRequest(packetData) -> tuple:
 
 def testPacketData(data) -> bytearray:
     lprint('Packet Data output: {0}'.format(data))
-    return(data)
+    return(formatPacket(data))
 RequestDict["1"] = testPacketData
 
 def createUserPacket(data) -> bytearray:
-    lprint
+    userDataDict = json.loads(data)
+    lprint(userDataDict)
+    if(userDataDict['username'] is None or userDataDict['email'] is None):
+        return formatPacket('Malformed Data Sent!')
+    else:
+        return formatPacket(f'Json Data Parsed! Username: {userDataDict["username"]} Email: {userDataDict["email"]}')
+    
 RequestDict["2"] = createUserPacket
 
+def formatPacket(data):
+    outPacket = bytearray(_HEADER)
+    outPacket.join(0xff)
+    outPacket.join(len(data).to_bytes(4, byteorder="big"))
+    outPacket.join(data)
+    outPacket.join(_FOOTER)
+    return outPacket
+    
 
-
-#Test Packet section!
-def testPackerRouting() -> bool:
+#Test Packet section, need to implement this to use netcode to test. This will only test logic for now!
+def testPackerRouting() -> String:
     try:
         lprint('Loading known good packet.')
         __TESTPACKET = bytearray([0x52,0x50,0x53,0x01,0x00,0x00,0x00,0x03,0x52,0x50,0x53,0x43,0x4f,0x4d,0x50,0x4c,0x45,0x58]) 
         lprint(__TESTPACKET.decode('utf-8'))
         lprint("Test Packet Output: " + str(handleTCPRequest(__TESTPACKET)))
-        return True
-    except:
-        return False
+        return 'Pass'
+    except Exception:
+        return 'Fail'
 

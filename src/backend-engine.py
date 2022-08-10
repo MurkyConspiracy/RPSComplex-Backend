@@ -1,5 +1,12 @@
 from libraries import *
-from libraries.nethandler import netsock
+from libraries.nethandler import netthread
+from libraries.loghandler import lprint
 
-netConnection = netsock(6666)
-libraries.loghandler.lprint('Packet test pass:\t{0}'.format(str(libraries.datahandler.testPackerRouting())))
+def main():
+        
+        libraries.confighandler.loadConfig()
+        netConnection = netthread(libraries.confighandler.getPort())
+        lprint('Packet test pass:\t{0}'.format(str(libraries.datahandler.testPackerRouting())))
+
+if __name__ == "__main__":
+                main()
