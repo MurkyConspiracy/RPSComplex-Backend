@@ -32,16 +32,16 @@ RequestDict = {}
 
 def handleTCPRequest(packetData) -> tuple:
     if packetData[:3] != _HEADER:
-        lprint("Failed Header check:\nControl:\t{0}\nInput:\t\t{1}".format(_HEADER,packetData[:3]))
+        lprint("Failed Header check:\nControl:\t{0}\nInput:\t\t{1}".format(_HEADER,packetData[:3]),2)
         return (False,"?","Header Check Failed!")
     elif packetData[len(packetData)-7:] != _FOOTER:
-        lprint("Failed Footer check:\nControl:\t{0}\nInput:\t\t{1}".format(_FOOTER,packetData[len(packetData)-7:]))
+        lprint("Failed Footer check:\nControl:\t{0}\nInput:\t\t{1}".format(_FOOTER,packetData[len(packetData)-7:]),2)
         return (False,"?","Footer Check Failed!")
     elif str(int(packetData[3])) not in RequestDict:
-        lprint("Failed Type Check:\nType:\t{0}".format(int(packetData[3])))
+        lprint("Failed Type Check:\nType:\t{0}".format(int(packetData[3])),2)
         return (False,"?","Packed ID not found!")
     elif int.from_bytes(packetData[4:8],byteorder='big') != len(packetData[8:len(packetData)-7]):
-        lprint("Failed Length Check:\nLength Recived")
+        lprint(f"Failed Length Check:\nLength Recived: {int.from_bytes(packetData[4:8],byteorder='big')}\nReal Length: {len(packetData[8:len(packetData)-7])}",2)
         return (False,str(RequestDict[str(packetData[3])].__qualname__),"Packet Length mismatch!")
     else:
         resultdata = RequestDict[str(packetData[3])](packetData[8:len(packetData)-7])

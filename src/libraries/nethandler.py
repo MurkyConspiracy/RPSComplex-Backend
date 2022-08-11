@@ -21,7 +21,7 @@ class netthread:
         self._hostname = socket.gethostname()
         self._socket = self._buildSocket()
         netthread = threading.Thread(target=self._listen)
-        lprint('Starting network thread!')
+        lprint('Starting network thread!',1)
         netthread.start()
     
     #Creates the TCP/IP socket and binds it to the defined port on the address
@@ -31,7 +31,7 @@ class netthread:
         sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
         lprint('Binding...')
         sock.bind((self._hostname,self._port))
-        lprint('Socket established')
+        lprint('Socket established',1)
         return sock
 
     #Starts the socket listening and gives it 11 (arbitrary) concurrent connections
@@ -39,7 +39,7 @@ class netthread:
     def _listen(self):
         lprint('Starting to listen...')
         self._socket.listen(11)
-        lprint('Waiting for data...')
+        lprint('Waiting for data...',1)
         conn, addr = self._socket.accept()
         with conn:
             while True:
@@ -57,11 +57,11 @@ class netthread:
                 requestState = handleTCPRequest(data)
                 lprint(f'TCP Packet State Alert:\t{requestState[1]}')
                 if len(requestState) == 3:
-                    packetResponse = f'Packet State:\t{requestState[0]}\nRouted:\t{requestState[1]}\nValue:\t{requestState[2]}'.encode('utf-8')
+                    packetResponse = f'Packet routed?\t{requestState[0]}\nMessage:\t{requestState[1]}\nValue:\t{requestState[2]}'.encode('utf-8')
                     lprint(packetResponse)
                     conn.send(packetResponse)
                 else:
-                    lprint("Malformed Response!")
+                    lprint("Malformed Response!",2)
         lprint('End Listen...')
         self._listen()
                 
