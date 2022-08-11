@@ -1,6 +1,5 @@
 # RPSComplex-Backend
-Rock Paper Scissors broken into a multi server application to show use of Docker and code collaboration.
-Utilizing socket programming to take requests from the frontend, parse data, and store it on a database.
+Rock Paper Scissors broken into a multi server application to show use of Docker and code collaboration. Utilizing socket programming to take requests from the frontend, parse data and store it on a database.
 
 ## Packet Structure and Layout
 Incoming Packet Structure
@@ -26,6 +25,19 @@ Incoming Packet Structure
     43, 4F, 4D, 50, 4C, 45, 58
 
 # Request Types
-##### ID:1
+#### ID:1
   
-  Validate packet integrity and send back Boolean
+    Validate packet integrity and send back Boolean
+
+#### ID:2
+
+    Create user based on incoming data.
+    Incoming data will be accepted in the form of a json string containing the following:
+        "username"
+        "email"
+        "password_hash"
+
+#### ID:255
+
+    Return packet data default
+    This might be phased out in favor of specific return codes
