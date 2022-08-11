@@ -50,35 +50,48 @@ def handleTCPRequest(packetData) -> tuple:
 
 def testPacketData(data) -> bytearray:
     lprint('Packet Data output: {0}'.format(data))
-    return(formatPacket(data))
+    return(formatPacket(data, 255))
 RequestDict["1"] = testPacketData
 
 def createUserPacket(data) -> bytearray:
     userDataDict = json.loads(data)
     lprint(userDataDict)
     if(userDataDict['username'] is None or userDataDict['email'] is None):
-        return formatPacket('Malformed Data Sent!')
+        return formatPacket('Malformed Data Sent!', 255)
     else:
-        return formatPacket(f'Json Data Parsed! Username: {userDataDict["username"]} Email: {userDataDict["email"]}')
-    
+        return formatPacket(f'Json Data Parsed! Username: {userDataDict["username"]} Email: {userDataDict["email"]}', 255)
 RequestDict["2"] = createUserPacket
 
-def formatPacket(data):
+def formatPacket(data: any, packetType: int):
     outPacket = bytearray(_HEADER)
-    outPacket.append(0xff)
+    if packetType > 255 or packetType < 0:
+        raise ValueError('Invalid int!')
+    outPacket.append(packetType)
     outPacket.extend(len(data).to_bytes(4, byteorder="big"))
-    outPacket.extend(bytes(data))
+    try:
+        outPacket.extend(data)
+    except TypeError:
+        outPacket.extend(str(data).encode('utf-8'))
+    
     outPacket.extend(_FOOTER)
     return outPacket
     
 
 #Test Packet section, need to implement this to use netcode to test. This will only test logic for now!
 def testPackerRouting() -> String:
-    try:
+    #try:
         lprint('Loading known good packet.')
-        __TESTPACKET = bytearray([0x52,0x50,0x53,0x01,0x00,0x00,0x00,0x03,0x52,0x50,0x53,0x43,0x4f,0x4d,0x50,0x4c,0x45,0x58]) 
-        lprint(__TESTPACKET.decode('utf-8'))
-        lprint("Test Packet Output: " + str(handleTCPRequest(__TESTPACKET)))
+        __TESTPACKET_TEST = bytearray([0x52,0x50,0x53,0x01,0x00,0x00,0x00,0x03,0x52,0x50,0x53,0x43,0x4f,0x4d,0x50,0x4c,0x45,0x58]) 
+        lprint(__TESTPACKET_TEST.decode('utf-8'))
+        lprint("Test Packet Output: " + str(handleTCPRequest(__TESTPACKET_TEST)))
+        lprint('Loading known good packet.')
+        __TESTPACKET_ACCOUNTCREATE = formatPacket('{"username": "testing", "email": "test@test.org"}', 2) 
+        lprint(__TESTPACKET_ACCOUNTCREATE.decode('utf-8'))
+        lprint("Test Packet Output: " + str(handleTCPRequest(__TESTPACKET_ACCOUNTCREATE)))
         return 'Pass'
-    except:
-        return 'Fail'
+    #except Exception as e:
+    #    import os, sys
+    #    exc_type, exc_obj, exc_tb = sys.exc_info()
+    #    fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+    #    lprint(f'Error: {exc_type} fname: {fname} line: {exc_tb.tb_lineno}')
+    #    return 'Fail'
