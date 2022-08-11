@@ -19,7 +19,10 @@ def loadConfig():
         lprint("Config loaded!")
 
 def createConfig():
-    lprint('Config Created!')
+    import os
+    lprint(os.getcwd())
+    for file in os.listdir(os.getcwd()):
+        lprint(file)
 
 def getPort():
     return config_dict["server"]["port"]

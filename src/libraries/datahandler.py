@@ -1,3 +1,4 @@
+from doctest import OutputChecker
 import json
 from tokenize import String
 from libraries.loghandler import lprint
@@ -64,10 +65,10 @@ RequestDict["2"] = createUserPacket
 
 def formatPacket(data):
     outPacket = bytearray(_HEADER)
-    outPacket.join(0xff)
-    outPacket.join(len(data).to_bytes(4, byteorder="big"))
-    outPacket.join(data)
-    outPacket.join(_FOOTER)
+    outPacket.append(0xff)
+    outPacket.extend(len(data).to_bytes(4, byteorder="big"))
+    outPacket.extend(bytes(data))
+    outPacket.extend(_FOOTER)
     return outPacket
     
 
@@ -79,6 +80,5 @@ def testPackerRouting() -> String:
         lprint(__TESTPACKET.decode('utf-8'))
         lprint("Test Packet Output: " + str(handleTCPRequest(__TESTPACKET)))
         return 'Pass'
-    except Exception:
+    except:
         return 'Fail'
-
