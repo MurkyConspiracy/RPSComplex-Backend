@@ -6,9 +6,9 @@ name = "Nicholas Reeder"
 [database]
 server = "172.17.0.3"
 port = 1433
-enabled = false
+enabled = 0
 
 [server]
 port = 6666
-printdebuglog = true
+printdebuglog = 1
 
