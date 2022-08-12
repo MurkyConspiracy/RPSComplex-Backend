@@ -25,11 +25,11 @@ Incoming Packet Structure
     43, 4F, 4D, 50, 4C, 45, 58
 
 # Request Types
-#### ID:1
+#### ID:0 - Incoming
   
     Validate packet integrity and send back Boolean
 
-#### ID:2
+#### ID:1 - Incoming
 
     Create user based on incoming data.
     Incoming data will be accepted in the form of a json string containing the following:
@@ -37,7 +37,31 @@ Incoming Packet Structure
         "email"
         "password_hash"
 
+#### ID:127 - Outgoing
+
+    Return packet from incoming validity check.
+    Return data is a json string formatted containging the following:
+        "status" ("passed")
+
+#### ID:128 - Outgoing
+
+    Return packet from incoming create account request.
+    Return data is a json string formatted containging the following:
+        "status" ("passed" / "failed")
+        "reason" ("Account Created" / Error Message) 
+            Failure Status Messages:
+                Email already registered
+                Username already taken
+                Malformed User Data
+
 #### ID:255
 
-    Return packet data default
-    This might be phased out in favor of specific return codes
+    Return packet that had malformed data with error code.
+    Return data is a json string formatted containing the following:
+        "status" ("failed")
+        "reason" (Check Fail Reasoning)
+            Failure Status Messages:
+                Failed header check
+                Failed footer check
+                Failed packet ID check
+                Failed packet length check

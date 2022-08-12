@@ -54,14 +54,9 @@ class netthread:
                 if not data:
                     break
                 lprint(str(data))
-                requestState = handleTCPRequest(data)
-                lprint(f'TCP Packet State Alert:\t{requestState[1]}')
-                if len(requestState) == 3:
-                    packetResponse = f'Packet routed?\t{requestState[0]}\nMessage:\t{requestState[1]}\nValue:\t{requestState[2]}'.encode('utf-8')
-                    lprint(packetResponse)
-                    conn.send(packetResponse)
-                else:
-                    lprint("Malformed Response!",2)
+                packetResponse = handleTCPRequest(data)
+                lprint(packetResponse)
+                conn.send(packetResponse[2])
         lprint('End Listen...')
         self._listen()
                 

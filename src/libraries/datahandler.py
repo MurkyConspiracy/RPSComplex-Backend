@@ -29,39 +29,6 @@ _FOOTER = (b'COMPLEX')
 
 RequestDict = {}
 
-
-def handleTCPRequest(packetData) -> tuple:
-    if packetData[:3] != _HEADER:
-        lprint("Failed Header check:\nControl:\t{0}\nInput:\t\t{1}".format(_HEADER,packetData[:3]),2)
-        return (False,"?","Header Check Failed!")
-    elif packetData[len(packetData)-7:] != _FOOTER:
-        lprint("Failed Footer check:\nControl:\t{0}\nInput:\t\t{1}".format(_FOOTER,packetData[len(packetData)-7:]),2)
-        return (False,"?","Footer Check Failed!")
-    elif str(int(packetData[3])) not in RequestDict:
-        lprint("Failed Type Check:\nType:\t{0}".format(int(packetData[3])),2)
-        return (False,"?","Packed ID not found!")
-    elif int.from_bytes(packetData[4:8],byteorder='big') != len(packetData[8:len(packetData)-7]):
-        lprint(f"Failed Length Check:\nLength Recived: {int.from_bytes(packetData[4:8],byteorder='big')}\nReal Length: {len(packetData[8:len(packetData)-7])}",2)
-        return (False,str(RequestDict[str(packetData[3])].__qualname__),"Packet Length mismatch!")
-    else:
-        resultdata = RequestDict[str(packetData[3])](packetData[8:len(packetData)-7])
-        return (True,"Packet Routed!", resultdata)
-
-
-def testPacketData(data) -> bytearray:
-    lprint('Packet Data output: {0}'.format(data))
-    return(formatPacket(data, 255))
-RequestDict["1"] = testPacketData
-
-def createUserPacket(data) -> bytearray:
-    userDataDict = json.loads(data)
-    lprint(userDataDict)
-    if(userDataDict['username'] is None or userDataDict['email'] is None):
-        return formatPacket('Malformed Data Sent!', 255)
-    else:
-        return formatPacket(f'Json Data Parsed! Username: {userDataDict["username"]} Email: {userDataDict["email"]}', 255)
-RequestDict["2"] = createUserPacket
-
 def formatPacket(data: any, packetType: int):
     outPacket = bytearray(_HEADER)
     if packetType > 255 or packetType < 0:
@@ -76,16 +43,53 @@ def formatPacket(data: any, packetType: int):
     outPacket.extend(_FOOTER)
     return outPacket
     
+    
+def handleTCPRequest(packetData) -> tuple:
+    if packetData[:3] != _HEADER:
+        lprint("Failed Header check:\nControl:\t{0}\nInput:\t\t{1}".format(_HEADER,packetData[:3]),2)
+        return (False,"?",formatPacket(f'{{"status":"failed","reason":"Failed header check"}}',255))
+    elif packetData[len(packetData)-7:] != _FOOTER:
+        lprint("Failed Footer check:\nControl:\t{0}\nInput:\t\t{1}".format(_FOOTER,packetData[len(packetData)-7:]),2)
+        return (False,"?",formatPacket(f'{{"status":"failed","reason":"Failed footer check"}}',255))
+    elif str(int(packetData[3])) not in RequestDict:
+        lprint("Failed Type Check:\nType:\t{0}".format(int(packetData[3])),2)
+        return (False,"?",formatPacket(f'{{"status":"failed","reason":"Failed packet ID check"}}',255))
+    elif int.from_bytes(packetData[4:8],byteorder='big') != len(packetData[8:len(packetData)-7]):
+        lprint(f"Failed Length Check:\nLength Recived: {int.from_bytes(packetData[4:8],byteorder='big')}\nReal Length: {len(packetData[8:len(packetData)-7])}",2)
+        return (False,str(RequestDict[str(packetData[3])].__qualname__),formatPacket(f'{{"status":"failed","reason":"Failed packet length check"}}',255))
+    else:
+        resultdata = RequestDict[str(packetData[3])](packetData[8:len(packetData)-7])
+        return (True,"Packet Routed!", resultdata)
+
+
+def testPacketData(data) -> bytearray:
+    lprint(f'Packet Data output: {data}')
+    return(formatPacket(f'{{"status":"passed"}}', 127))
+RequestDict["0"] = testPacketData
+
+def createUserPacket(data) -> bytearray:
+    try:
+        userDataDict = json.loads(data)
+    except json.JSONDecodeError:
+        return formatPacket(f'{{"status":"Malformed User Data"}}', 128)
+    lprint(userDataDict)
+    #Need to test this, this might need to be a try except block. I am not sure if userDataDict[] will return None or an exception
+    if(userDataDict['username'] is None or userDataDict['email'] is None):
+        return formatPacket(f'{{"status":"Malformed User Data"}}', 128)
+    #Need to create data handling with a database next.
+    return formatPacket(f'{{"status":"passed","reason":"Account Created"}}',128)
+RequestDict["1"] = createUserPacket
+
 
 #Test Packet section, need to implement this to use netcode to test. This will only test logic for now!
 def testPackerRouting() -> String:
     try:
         lprint('Loading known good packet.')
-        __TESTPACKET_TEST = bytearray([0x52,0x50,0x53,0x01,0x00,0x00,0x00,0x03,0x52,0x50,0x53,0x43,0x4f,0x4d,0x50,0x4c,0x45,0x58]) 
+        __TESTPACKET_TEST = bytearray([0x52,0x50,0x53,0x00,0x00,0x00,0x00,0x03,0x52,0x50,0x53,0x43,0x4f,0x4d,0x50,0x4c,0x45,0x58]) 
         lprint(__TESTPACKET_TEST.decode('utf-8'))
         lprint("Test Packet Output: " + str(handleTCPRequest(__TESTPACKET_TEST)))
         lprint('Loading known good packet.')
-        __TESTPACKET_ACCOUNTCREATE = formatPacket('{"username": "testing", "email": "test@test.org"}', 2) 
+        __TESTPACKET_ACCOUNTCREATE = formatPacket('{"username": "testing", "email": "test@test.org"}', 1) 
         lprint(__TESTPACKET_ACCOUNTCREATE.decode('utf-8'))
         lprint("Test Packet Output: " + str(handleTCPRequest(__TESTPACKET_ACCOUNTCREATE)))
         return 'Pass'
