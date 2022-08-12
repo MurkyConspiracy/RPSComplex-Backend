@@ -79,7 +79,7 @@ def formatPacket(data: any, packetType: int):
 
 #Test Packet section, need to implement this to use netcode to test. This will only test logic for now!
 def testPackerRouting() -> String:
-    #try:
+    try:
         lprint('Loading known good packet.')
         __TESTPACKET_TEST = bytearray([0x52,0x50,0x53,0x01,0x00,0x00,0x00,0x03,0x52,0x50,0x53,0x43,0x4f,0x4d,0x50,0x4c,0x45,0x58]) 
         lprint(__TESTPACKET_TEST.decode('utf-8'))
@@ -89,9 +89,9 @@ def testPackerRouting() -> String:
         lprint(__TESTPACKET_ACCOUNTCREATE.decode('utf-8'))
         lprint("Test Packet Output: " + str(handleTCPRequest(__TESTPACKET_ACCOUNTCREATE)))
         return 'Pass'
-    #except Exception as e:
-    #    import os, sys
-    #    exc_type, exc_obj, exc_tb = sys.exc_info()
-    #    fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-    #    lprint(f'Error: {exc_type} fname: {fname} line: {exc_tb.tb_lineno}')
-    #    return 'Fail'
+    except Exception as e:
+        import os, sys
+        exc_type, exc_obj, exc_tb = sys.exc_info()
+        fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+        lprint(f'Error: {exc_type} fname: {fname} line: {exc_tb.tb_lineno}')
+        return 'Fail'
