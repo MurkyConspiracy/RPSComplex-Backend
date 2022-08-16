@@ -54,7 +54,7 @@ Incoming Packet Structure
                 Username already taken
                 Malformed User Data
 
-#### ID:255
+#### ID:255 -Outgoing
 
     Return packet that had malformed data with error code.
     Return data is a json string formatted containing the following:
