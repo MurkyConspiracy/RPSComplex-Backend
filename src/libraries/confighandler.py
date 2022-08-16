@@ -43,7 +43,7 @@ def createConfig():
 
     [server]
     port = 6666
-    printdebuglog = 1'''
+    printdebuglog = 0'''
 
     with open('config/ServerConfig.toml', mode='w+') as configfile:
         configfile.write(defaultconfig)

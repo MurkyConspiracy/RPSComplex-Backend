@@ -1,0 +1,13 @@
+title = "RPSComplex-Backend Config"
+
+    [owner]
+    name = "Nicholas Reeder"
+
+    [database]
+    server = "172.17.0.3"
+    port = 1433
+    enabled = 0
+
+    [server]
+    port = 6666
+    printdebuglog = 0
