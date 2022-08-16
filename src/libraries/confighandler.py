@@ -40,6 +40,8 @@ def createConfig():
     server = "172.17.0.3"
     port = 1433
     enabled = 0
+    username = ""
+    password = ""
 
     [server]
     port = 6666
